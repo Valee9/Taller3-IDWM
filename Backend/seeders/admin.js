@@ -7,7 +7,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 // Contraseña para generar el hash.
 let password = process.env.JWT_SECRET;
-console.log(password)
 // Genera un valor aleatorio para el proceso de hashing.
 const salt = await bcrypt.genSalt();
 // Genera el hash de la contraseña utilizando el algoritmo bcrypt.
