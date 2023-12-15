@@ -1,82 +1,81 @@
-
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, TextInput, View, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Button, ActivityIndicator } from 'react-native-paper';
+import { AuthContext } from '../context/AuthContext';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Registration = ({ navigation }) => {
-    const [correo, setCorreo] = useState('');
-    const [nombre, setNombre] = useState('');
-    const [año, setAño] = useState('');
+
+    const { signUp } = useContext(AuthContext)
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
+    const [year, setYear] = useState('');
     const [rut, setRut] = useState('');
 
-    const [validationCorreo, setValidationCorreo] = useState('');
-    const [validationNombre, setValidationNombre] = useState('');
-    const [validationAño, setValidationAño] = useState('');
+    const [validationEmail, setValidationEmail] = useState('');
+    const [validationName, setValidationName] = useState('');
+    const [validationYear, setValidationYear] = useState('');
     const [validationRut, setValidationRut] = useState('');
 
-    const [validationColorCorreo, setValidationColorCorreo] = useState('');
-    const [validationColorNombre, setValidationColorNombre] = useState('');
-    const [validationColorAño, setValidationColorAño] = useState('');
+    const [validationColorEmail, setValidationColorEmail] = useState('');
+    const [validationColorName, setValidationColorName] = useState('');
+    const [validationColorYear, setValidationColorYear] = useState('');
     const [validationColorRut, setValidationColorRut] = useState('');
 
-    const validateCorreo = () => {
-        console.log(correo);
-    
-        const correoRegex = /^[a-zA-Z0-9._-]+@(ucn\.cl|alumnos\.ucn\.cl|disc\.ucn\.cl|ce\.ucn\.cl)$/;
-        if (!isNaN(correo)) {
-            setValidationCorreo('Debe ingresar un correo');
-            setValidationColorCorreo('red');
+    const validateEmail = () => {
+        const emailRegex = /^[a-zA-Z0-9._-]+@(ucn\.cl|alumnos\.ucn\.cl|disc\.ucn\.cl|ce\.ucn\.cl)$/;
+        if (!email) {
+            setValidationEmail('Debe ingresar un correo');
+            setValidationColorEmail('red');
         }
-        else if (correoRegex.test(correo)) {
-            setValidationCorreo('Correo válido');
-            setValidationColorCorreo('green');
+        else if (emailRegex.test(email)) {
+            setValidationEmail('Correo válido');
+            setValidationColorEmail('green');
         } else {
-            setValidationCorreo('Ingrese un correo de dominio UCN');
-            setValidationColorCorreo('red');
+            setValidationEmail('Ingrese un correo de dominio UCN');
+            setValidationColorEmail('red');
         }
     };
 
-    const validateNombre = () => {
-        console.log(nombre)
-        const longitudNombre = nombre.trim().length;
-        if (!isNaN(nombre)) {
-            setValidationNombre('Debe ingresar un nombre');
-            setValidationColorNombre('red');
+    const validateName = () => {
+        const longitudName = name.trim().length;
+        if (!name) {
+            setValidationName('Debe ingresar un nombre');
+            setValidationColorName('red');
         }
-        else if (/^[a-zA-Z ]+$/.test(nombre)) {
-            console.log("Letras");
-            if (longitudNombre < 10 || longitudNombre > 150) {
-                setValidationNombre('El nombre debe tener entre 10 y 150 caracteres');
-                setValidationColorNombre('red');
+        else if (/^[a-zA-Z ]+$/.test(name)) {
+            if (longitudName < 10 || longitudName > 150) {
+                setValidationName('El nombre debe tener entre 10 y 150 caracteres');
+                setValidationColorName('red');
             } else {
-                setValidationNombre('Nombre válido');
-                setValidationColorNombre('green');
+                setValidationName('Nombre válido');
+                setValidationColorName('green');
             }
         } else {
-            setValidationNombre('Solo se permiten letras');
-            setValidationColorNombre('red');
+            setValidationName('Solo se permiten letras');
+            setValidationColorName('red');
         }
     };
 
-    const validateAño = () => {
-        console.log(año)
-        if (!isNaN(año)) {
-            setValidationAño('Debe ingresar un año');
-            setValidationColorAño('red');
+    const validateYear = () => {
+        if (!year) {
+            setValidationYear('Debe ingresar un año');
+            setValidationColorYear('red');
         }
-        else if (!/^\d+$/.test(año)) {
-            setValidationAño('Solo se permiten números');
-            setValidationColorAño('red');
+        else if (!/^\d+$/.test(year)) {
+            setValidationYear('Solo se permiten números');
+            setValidationColorYear('red');
+
         } else {
-            const numericAño = parseInt(año, 10);
-    
-            if (numericAño >= 1900 && numericAño <= 2023) {
-                setValidationAño('Año de nacimiento válido');
-                setValidationColorAño('green');
+            const numericYear = parseInt(year, 10);
+
+            if (numericYear >= 1900 && numericYear <= 2023) {
+                setValidationYear('Año de nacimiento válido');
+                setValidationColorYear('green');
             } else {
-                setValidationAño('El año debe estar entre 1900 y 2023');
-                setValidationColorAño('red');
+                setValidationYear('El año debe estar entre 1900 y 2023');
+                setValidationColorYear('red');
             }
         }
     };
@@ -96,10 +95,9 @@ const Registration = ({ navigation }) => {
         }
 
         const resultado = (11 - (suma % 11)).toString();
-
         const digitoVerificador = resultado === '10' ? 'K' : resultado;
 
-        if (!isNaN(rut)) {
+        if (!rut) {
             setValidationRut('Debe ingresar un rut');
             setValidationColorRut('red');
         }
@@ -112,16 +110,31 @@ const Registration = ({ navigation }) => {
         }
     };
 
-    
-
-
-    
+    const [isValid, setIsValid] = useState(false);
+    useEffect(() => {
+        validateEmail();
+        validateName();
+        validateYear();
+        validateRut();
+    }, [email, name, year, rut]);
+    useEffect(() => {
+        // Verifica si todas las validaciones son exitosas
+        setIsValid(
+            validationEmail === 'Correo válido' &&
+            validationName === 'Nombre válido' &&
+            validationYear === 'Año de nacimiento válido' &&
+            validationRut === 'RUT válido'
+        );
+    }, [validationEmail, validationName, validationYear, validationRut]);
 
     const handleButton = () => {
-        validateCorreo();
-        validateNombre();
-        validateAño();
-        validateRut();
+        if (isValid) {
+            console.log(email, name, year, rut);
+            signUp({ email, name, year, rut });
+        }
+    };
+    const toIndex = () => {
+        navigation.navigate('Index');
     };
     return (
         <SafeAreaView style={styles.container}>
@@ -129,6 +142,11 @@ const Registration = ({ navigation }) => {
                 <View style={styles.orange}></View>
                 <View style={styles.black}></View>
                 <View style={styles.gray}></View>
+            </View>
+            <View style={styles.back}>
+                <TouchableOpacity style={styles.buttonBack} onPress={() => toIndex()}>
+                    <Icon name="arrow-left" size={20} color="black" weight="light" />
+                </TouchableOpacity>
             </View>
             <View style={styles.body}>
                 <Text style={styles.title}>MobileHub</Text>
@@ -140,12 +158,12 @@ const Registration = ({ navigation }) => {
                         style={styles.input}
                         placeholder='correo@alumnos.ucn.cl'
                         placeholderTextColor='#ccc'
-                        value={correo}
-                        onChangeText={(text) => setCorreo(text)}
+                        value={email}
+                        onChangeText={(text) => setEmail(text)}
                     />
-                    {validationCorreo !== '' && (
+                    {email !== '' && validationEmail !== '' && (
                         <View style={styles.validationMessageContainer}>
-                            <Text style={[styles.validationCorreo, { color: validationColorCorreo }]}>{validationCorreo}</Text>
+                            <Text style={[styles.validationEmail, { color: validationColorEmail }]}>{validationEmail}</Text>
                         </View>
                     )}
                     <Text style={styles.label}>Nombre completo</Text>
@@ -153,12 +171,12 @@ const Registration = ({ navigation }) => {
                         style={styles.input}
                         placeholder='Juan Perez'
                         placeholderTextColor='#ccc'
-                        value={nombre}
-                        onChangeText={(text) => setNombre(text)}
+                        value={name}
+                        onChangeText={(text) => setName(text)}
                     />
-                    {validationNombre !== '' && (
+                    {name !== '' && validationName !== '' && (
                         <View style={styles.validationMessageContainer}>
-                            <Text style={[styles.validationNombre, { color: validationColorNombre }]}>{validationNombre}</Text>
+                            <Text style={[styles.validationName, { color: validationColorName }]}>{validationName}</Text>
                         </View>
                     )}
                     <Text style={styles.label}>Año de nacimiento</Text>
@@ -167,12 +185,12 @@ const Registration = ({ navigation }) => {
                         placeholder='1900'
                         placeholderTextColor='#ccc'
                         keyboardType="numeric"
-                        value={año}
-                        onChangeText={(text) => setAño(text)}
+                        value={year}
+                        onChangeText={(text) => setYear(text)}
                     />
-                    {validationAño !== '' && (
+                    {year !== '' && validationYear !== '' && (
                         <View style={styles.validationMessageContainer}>
-                            <Text style={[styles.validationAño, { color: validationColorAño }]}>{validationAño}</Text>
+                            <Text style={[styles.validationYear, { color: validationColorYear }]}>{validationYear}</Text>
                         </View>
                     )}
                     <Text style={styles.label}>Rut</Text>
@@ -183,7 +201,7 @@ const Registration = ({ navigation }) => {
                         value={rut}
                         onChangeText={(text) => setRut(text)}
                     />
-                    {validationRut !== '' && (
+                    {rut !== '' && validationRut !== '' && (
                         <View style={styles.validationMessageContainer}>
                             <Text style={[styles.validationRut, { color: validationColorRut }]}>{validationRut}</Text>
                         </View>
@@ -193,13 +211,19 @@ const Registration = ({ navigation }) => {
 
                 <StatusBar style="auto" />
                 <Button
-                    style={styles.button}
+                    style={[styles.button,
+                        !isValid && { backgroundColor: 'gray' },]}
                     mode="contained"
                     contentStyle={styles.buttonContent}
-                    labelStyle={styles.buttonLabel}
+                    labelStyle={[
+                        styles.buttonLabel,
+                        !isValid && { color: 'white' },
+                    ]}
                     onPress={handleButton}
+                    disabled={!isValid}
+
                 >
-                    Iniciar
+                    Registrarse
                 </Button>
             </View>
             <View style={styles.footer}>
@@ -215,7 +239,6 @@ const Registration = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
         justifyContent: 'center',
     },
     header: {
@@ -319,6 +342,9 @@ const styles = StyleSheet.create({
     },
     validationMessage: {
         color: 'white',
+    },
+    buttonBack: {
+        margin: '5px'
     },
 });
 
