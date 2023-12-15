@@ -1,9 +1,10 @@
 
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, TextInput, View, Image, Alert, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Button, ActivityIndicator } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Login = ({ navigation }) => {
 
@@ -11,17 +12,27 @@ const Login = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSignIn = () => {
+    const handleSignIn = async () => {
         console.log(email,password)
-        // signIn(email, password);
-      };
+        setEmail("valentina.hormazabal@alumnos.ucn.cl"),
+        setPassword("lala")
+        await signIn({email, password});
+    };
 
+    const toIndex = () => {
+        navigation.navigate('Index');
+    };
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.orange}></View>
                 <View style={styles.black}></View>
                 <View style={styles.gray}></View>
+            </View>
+            <View style={styles.back}>
+                <TouchableOpacity style={styles.buttonBack} onPress={() => toIndex()}>
+                    <Icon name="arrow-left" size={20} color="black" weight="light" />
+                </TouchableOpacity>
             </View>
             <View style={styles.body}>
                 <Text style={styles.title}>MobileHub</Text>
@@ -51,7 +62,7 @@ const Login = ({ navigation }) => {
                 <Button
                     style={styles.button}
                     mode="contained"
-                    onPress={signIn}
+                    onPress={handleSignIn}
                     contentStyle={styles.buttonContent}
                     labelStyle={styles.buttonLabel}
                 >
@@ -71,7 +82,6 @@ const Login = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
         justifyContent: 'center',
     },
     header: {
@@ -167,9 +177,9 @@ const styles = StyleSheet.create({
         fontFamily: 'Inika',
         fontSize: 20
     },
-    activityIndicator: {
-        marginTop: 20
-    }
+    buttonBack: {
+        margin: '5px'
+    },
 });
 
 export default Login;
