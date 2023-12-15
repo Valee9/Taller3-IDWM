@@ -8,28 +8,43 @@ import React from 'react'
 // notAuthenticated
 // logout
 export const AuthReducer = (state, action) => {
-    switch(action.type){
-        case "sign-up":
+    switch (action.type) {
+        case "signUp":
+            return {
+                ...state,
+                errorMessage: '',
+                status: 'authenticated',
+                token: action.payload.token,
+                user: action.payload.user,
+                rut: action.payload.rut,
+            }
+        case "notAuthenticated":
             return {
 
             }
-            case "notAuthenticated":
+        case "logout":
             return {
-                
+                ...state,
+                errorMessage: [],
+                status: 'not-authenticated',
+                token: null,
+                user: null,
             }
-            case "logout":
+        case "addError":
             return {
-                
+                ...state,
+                errorMessage: action.payload,
+                status: 'not-authenticated',
+                token: null,
+                user: null,
+                rut: null
             }
-            case "addError":
+        case "removeError":
             return {
-                
+                ...state,
+                errorMessage: [],
             }
-            case "removeError":
-            return {
-                
-            }
-            default:
-                return state;
+        default:
+            return state;
     }
 }
