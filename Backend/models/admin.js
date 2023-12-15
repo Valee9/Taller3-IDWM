@@ -7,7 +7,7 @@ const adminSchema = new mongoose.Schema({
     name: { type: String, required: true },
     year: {  type: Number, required: true},
     rut: { type: String, unique: true, required: true },
-    password: { type: String, required: true }
+    password: { type: String, required: true, bcrypt: true }
 })
 
 // Exportación del modelo Admin
