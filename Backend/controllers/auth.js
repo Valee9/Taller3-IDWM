@@ -23,12 +23,12 @@ export const adminLogin = async (req, res) => {
         const admin = await Admin.findOne({ email });
         // Verifica si el administrador no existe o la contraseña no coincide.
         if (!admin || !(await bcrypt.compare(password, admin.password))) {
-            return res.status(401).json({ msg: "Invalid username or password." });
+            return res.status(401).json({ msg: "Invalis email or password." });
         }
         // Genera un token de autenticación usando el secreto JWT.
-        const token = jwt.sign({ id: admin.email }, process.env.JWT_SECRET);
+        const token = jwt.sign({ rut: admin.rut }, process.env.JWT_SECRET);
         // Envía una respuesta exitosa con el token.
-        res.status(200).json({ token});
+        res.status(200).json({ token, admin});
     } catch (err) {
         // Envía una respuesta de error si ocurre algún problema durante la autenticación.
         res.status(500).json({ error: err.message });
