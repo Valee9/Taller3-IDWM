@@ -1,3 +1,4 @@
+// Importa los módulos necesarios de React, React Native y otras bibliotecas
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
@@ -7,40 +8,42 @@ import { AuthContext } from '../context/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 
+// Define el componente Home
 const Home = ({ navigation }) => {
 
+    // Obtiene la función de cierre de sesión desde el contexto de autenticación
     const { logOut } = useContext(AuthContext);
-
+    // Navega a la pantalla de perfil
     const toProfile = () => {
         navigation.navigate('Profile');
     };
-
+    // Navega a la pantalla de cambio de contraseña
     const toPassword = () => {
         navigation.navigate('Password');
     };
-
+    // Estado para almacenar la lista de repositorios y de commits
     const [repos, setRepos] = useState([])
     const [commits, setCommits] = useState([])
+    // Efecto para cargar la lista de repositorios al iniciar el componente
     useEffect(() => {
         const obtenerRepos = async () => {
             try {
+                // Realiza una solicitud para obtener la lista de repositorios desde el servidor
                 const response = await axios.get(`http://localhost:3001/repos`);
+                // Actualiza el estado con la lista de repositorios
                 setRepos(response.data)
-                console.log(response.data)
 
             } catch (error) {
                 console.error('Error al obtener los repositorios:', error.message);
             }
         };
-
         // Llama a la función para obtener los administradores
         obtenerRepos();
     }, []);
 
+    // Estado para la creación de la tabla de repositorios
     const tableHead = ['Nombre', 'Fecha', 'Commits', 'Acciones'];
-
     const tableData = repos.map((repo, index) => [
-
         `${repo.name}`,
         `${new Date(repo.created_at).toLocaleDateString()}`,
         `${repo.commits}`,
@@ -51,8 +54,9 @@ const Home = ({ navigation }) => {
         </View>
 
     ]);
-
+    // Estado para controlar la visibilidad del modal de commits
     const [visible, setVisible] = useState(false);
+    // Maneja el clic en el botón "Ver más" de un repositorio
     const handleVerMasClick = async (repo) => {
         console.log(`Ver más clic en el repositorio: ${repo.name}`);
         try {
@@ -62,22 +66,21 @@ const Home = ({ navigation }) => {
             // response.data contendrá la lista de commits
             const commit = response.data;
             setCommits(commit)
-            console.log(commit)
+            // Muestra el modal con los commits
             setVisible(true);
           } catch (error) {
             console.error('Error al obtener los commits:', error.message);
           }
     };
 
+    // Estado para la creación de la tabla de commits
     const tableHead1 = ['Mensaje', 'Fecha'];
-
     const tableData1 = commits.map((commit) => [
-
         `${commit.commit.message}`,
         `${new Date(commit.commit.author.date).toLocaleDateString()}`
-    
     ]);
 
+    // Renderiza el componente
     return (
         <Provider>
         <SafeAreaView style={styles.container}>
@@ -153,8 +156,10 @@ const Home = ({ navigation }) => {
             </View>
         </SafeAreaView>
         </Provider>
-    )
-}
+    );
+};
+
+// Estilos del componente
 const styles = StyleSheet.create({
     container: {
         flex: 1,
