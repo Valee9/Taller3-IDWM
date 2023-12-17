@@ -1,4 +1,4 @@
-import { StatusBar } from 'expo-status-bar';
+// Importa los módulos necesarios de React, React Native y otras bibliotecas
 import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Button, Modal, Portal, Provider } from 'react-native-paper';
@@ -6,18 +6,23 @@ import { AuthContext } from '../context/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 
+// Define el componente Password
 const Password = ({ navigation }) => {
+    // Obtiene el rut desde el contexto de autenticación
     const { rut } = useContext(AuthContext);
+    // Estado para almacenar el password, confirmPassword y si es visible
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [visible, setVisible] = useState(false);
     const [visible1, setVisible1] = useState(false);
-    const { logOut } = useContext(AuthContext);
+    // Efecto para cargar la contraseña del administrador
     useEffect(() => {
         const obtenerAdministradores = async () => {
             try {
+                // Realiza una solicitud para obtener los datos del administrador desde el servidor
                 const response = await axios.get(`http://localhost:3001/admin/${rut}`);
                 const administradores = response.data;
+                // Actualiza el estado con la información de los administradores
                 setPassword(administradores.password)
 
             } catch (error) {
@@ -29,8 +34,10 @@ const Password = ({ navigation }) => {
         obtenerAdministradores();
     }, []);
 
+    // Maneja la edición de la contraseña del administrador
     const editarAdministradores = async () => {
         console.log(password)
+        // Si las constraseñas ingresadas son distintas entre sí, abre un modal de error
         if (password !== confirmPassword) {
             console.log('Las contraseñas no coinciden');
             setVisible1(true);
@@ -40,6 +47,7 @@ const Password = ({ navigation }) => {
             return;
         }
 
+        // Actualiza la password con la ingresada
         const updates = { password }
         console.log(updates)
         try {
@@ -62,10 +70,12 @@ const Password = ({ navigation }) => {
         }
     };
 
+    // Navega a la pantalla de home
     const toHome = () => {
         navigation.navigate('Home');
         console.log("home")
     };
+    // Renderiza el componente
     return (
         <Provider>
             <SafeAreaView style={styles.container}>
@@ -97,8 +107,6 @@ const Password = ({ navigation }) => {
                             secureTextEntry
                         />
                     </View>
-
-                    <StatusBar style="auto" />
                     <Button
                         style={styles.button}
                         mode="contained"
@@ -133,8 +141,9 @@ const Password = ({ navigation }) => {
             </SafeAreaView>
         </Provider>
     );
-}
+};
 
+// Estilos del componente
 const styles = StyleSheet.create({
     container: {
         flex: 1,
