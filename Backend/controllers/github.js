@@ -52,6 +52,7 @@ const getCommitsCount = async (owner, repo) => {
         const response = await octokit.request("GET /repos/:owner/:repo/commits", {
             owner: owner,
             repo: repo,
+            per_page: 100,
         });
         // Retorna la cantidad de commits
         return response.data.length;
@@ -78,6 +79,7 @@ export const getCommits = async (req, res) => {
         const response = await octokit.request("GET /repos/:owner/:repo/commits", {
             owner: "Dizkm8",
             repo: repo,
+            per_page: 100,
         });
         // Almacena la respuesta en una constante de commits
         const commits = response.data;
