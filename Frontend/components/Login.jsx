@@ -2,7 +2,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView } from 'react-native';
-import { Button, ActivityIndicator } from 'react-native-paper';
+import { Button, Modal, Portal, Provider } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -11,18 +11,25 @@ const Login = ({ navigation }) => {
     const { signIn } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [visible, setVisible] = useState(false);
 
     const handleSignIn = async () => {
         console.log(email,password)
-        setEmail("valentina.hormazabal@alumnos.ucn.cl"),
-        setPassword("lala")
-        await signIn({email, password});
+        const response = await signIn({email, password});
+        console.log(response.success)
+        if (!response.success) {
+            setVisible(true);
+            setTimeout(() => {
+                setVisible(false);
+            }, 1500);
+        }
     };
 
     const toIndex = () => {
         navigation.navigate('Index');
     };
     return (
+        <Provider>
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.orange}></View>
@@ -69,13 +76,21 @@ const Login = ({ navigation }) => {
                     Iniciar
                 </Button>
             </View>
+            <Portal>
+                    <Modal visible={visible} style={styles.modalContainer} onDismiss={() => setVisible(false)}>
+                        <View style={styles.modalContent}>
+                            <Text style={[styles.title, { fontSize: 26}]}>Inicio de sesión incorrecto</Text>
+                            <Text style={[styles.subtitle1, { fontSize: 20}]}>Inténtalo otra vez</Text>
+                        </View>
+                    </Modal>
+                </Portal>
             <View style={styles.footer}>
                 <View style={styles.gray}></View>
                 <View style={styles.black}></View>
                 <View style={styles.orange}></View>
             </View>
         </SafeAreaView>
-
+        </Provider>
     );
 }
 
@@ -119,7 +134,7 @@ const styles = StyleSheet.create({
         fontSize: 36,
         color: '#FCAF43',
         fontFamily: 'Inika',
-        paddingBottom: 5
+        paddingBottom: 5,
     },
     subtitle1: {
         fontSize: 20,
@@ -175,10 +190,22 @@ const styles = StyleSheet.create({
     },
     buttonLabel: {
         fontFamily: 'Inika',
-        fontSize: 20
+        fontSize: 20,
+        color: 'white'
     },
     buttonBack: {
         margin: '5px'
+    },
+    modalContainer: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        alignItems: 'center',
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
     },
 });
 
