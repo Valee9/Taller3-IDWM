@@ -73,7 +73,6 @@ const Password = ({ navigation }) => {
     // Navega a la pantalla de home
     const toHome = () => {
         navigation.navigate('Home');
-        console.log("home")
     };
     // Renderiza el componente
     return (
