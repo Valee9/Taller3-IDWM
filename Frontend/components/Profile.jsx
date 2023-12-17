@@ -1,4 +1,4 @@
-import { StatusBar } from 'expo-status-bar';
+// Importa los módulos necesarios de React, React Native y otras bibliotecas
 import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Button, Modal, Portal, Provider } from 'react-native-paper';
@@ -6,22 +6,25 @@ import { AuthContext } from '../context/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 
+// Define el componente Profile
 const Profile = ({ navigation }) => {
-
+    // Obtiene el rut desde el contexto de autenticación
     const { rut } = useContext(AuthContext);
+     // Estado para almacenar el email, name y year
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [year, setYear] = useState('');
-
+    // Efecto para cargar el email, name y year del administrador
     useEffect(() => {
         const obtenerAdministradores = async () => {
             try {
+                // Realiza una solicitud para obtener los datos del administrador desde el servidor
                 const response = await axios.get(`http://localhost:3001/admin/${rut}`);
                 const administradores = response.data;
+                // Actualiza los estados con la información de los administradores
                 setEmail(administradores.email)
                 setName(administradores.name)
                 setYear(administradores.year)
-                console.log(email, name, year, rut)
 
             } catch (error) {
                 console.error('Error al obtener administradores:', error.message);
@@ -32,8 +35,7 @@ const Profile = ({ navigation }) => {
         obtenerAdministradores();
     }, []);
 
-
-    console.log(email, name, year, rut)
+    // Estado de las valdiaciones y colores de las validaciones
     const [validationEmail, setValidationEmail] = useState('');
     const [validationName, setValidationName] = useState('');
     const [validationYear, setValidationYear] = useState('');
@@ -42,6 +44,7 @@ const Profile = ({ navigation }) => {
     const [validationColorName, setValidationColorName] = useState('');
     const [validationColorYear, setValidationColorYear] = useState('');
 
+    // Valida si el email ingresado cumple con el formato definido
     const validateEmail = () => {
         const emailRegex = /^[a-zA-Z0-9._-]+@(ucn\.cl|alumnos\.ucn\.cl|disc\.ucn\.cl|ce\.ucn\.cl)$/;
         if (!email) {
@@ -57,6 +60,7 @@ const Profile = ({ navigation }) => {
         }
     };
 
+    // Valida si el name ingresado cumple con el formato definido
     const validateName = () => {
         const longitudName = name.trim().length;
         if (!name) {
@@ -77,6 +81,7 @@ const Profile = ({ navigation }) => {
         }
     };
 
+    // Valida si el year ingresado cumple con el formato definido
     const validateYear = () => {
         if (!year) {
             setValidationYear('Debe ingresar un año');
@@ -98,17 +103,19 @@ const Profile = ({ navigation }) => {
             }
         }
     };
-
+    // Estado de validez de la información y visibilidad de los modal  
     const [isValid, setIsValid] = useState(false);
     const [visible, setVisible] = useState(false);
     const [visible1, setVisible1] = useState(false);
 
+    // Efecto para cargar las funciones de validaciones
     useEffect(() => {
         validateEmail();
         validateName();
         validateYear();
     }, [email, name, year, rut]);
 
+    // Efecto para cargar las validaciones
     useEffect(() => {
         // Verifica si todas las validaciones son exitosas
         setIsValid(
@@ -118,14 +125,17 @@ const Profile = ({ navigation }) => {
         );
     }, [validationEmail, validationName, validationYear]);
 
+    // Función para editar la información de los administradores
     const editarAdministradores = async () => {
 
         const updates = { email, name, year }
         console.log(updates)
         try {
+            // Realiza una solicitud para actualizar los datos del administrador desde el servidor
             const response = await axios.put(`http://localhost:3001/admin/${rut}`, updates);
             console.log(response.data.message)
             if (response.data.continue == true) {
+                // Abre el modal de éxito
                 console.log('Cambio exitoso:');
                 setVisible(true);
                 setTimeout(() => {
@@ -133,6 +143,7 @@ const Profile = ({ navigation }) => {
                 }, 1500);
             }
         } catch (error) {
+            // Abre el modal de error
             console.log('Error en el cambio:');
             setVisible1(true);
             setTimeout(() => {
@@ -141,18 +152,19 @@ const Profile = ({ navigation }) => {
             throw error;
         }
     };
-
+    // Para editar los datos del administrador
     const handleButton = () => {
         if (isValid) {
             editarAdministradores()
         };
     }
 
+    // Navega a la pantalla de home
     const toHome = () => {
         navigation.navigate('Home');
-        console.log("home")
     };
 
+    // Renderiza el componente
     return (
         <Provider>
         <SafeAreaView style={styles.container}>
@@ -219,8 +231,6 @@ const Profile = ({ navigation }) => {
                     />
                     
                 </View>
-
-                <StatusBar style="auto" />
                 <Button
                     style={[styles.button,
                     !isValid && { backgroundColor: 'gray' },]}
@@ -260,8 +270,9 @@ const Profile = ({ navigation }) => {
         </SafeAreaView>
         </Provider>
     );
-}
+};
 
+// Estilos del componente
 const styles = StyleSheet.create({
     container: {
         flex: 1,
