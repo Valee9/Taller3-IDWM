@@ -1,18 +1,20 @@
-
-import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect, useContext } from 'react';
+// Importa los módulos necesarios de React, React Native y otras bibliotecas
+import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Button, Modal, Portal, Provider } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+// Define el componente Login
 const Login = ({ navigation }) => {
 
+    // Obtiene la función de inicio de sesión desde el contexto de autenticación
     const { signIn } = useContext(AuthContext);
+    // Estado para almacenar el email, password y si es visible
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [visible, setVisible] = useState(false);
-
+    // Maneja el inicio de sesión
     const handleSignIn = async () => {
         console.log(email,password)
         const response = await signIn({email, password});
@@ -24,10 +26,11 @@ const Login = ({ navigation }) => {
             }, 1500);
         }
     };
-
+    // Navega a la pantalla de index
     const toIndex = () => {
         navigation.navigate('Index');
     };
+    // Renderiza el componente
     return (
         <Provider>
         <SafeAreaView style={styles.container}>
@@ -64,8 +67,6 @@ const Login = ({ navigation }) => {
                         onChangeText={(text) => setPassword(text)}
                     />
                 </View>
-
-                <StatusBar style="auto" />
                 <Button
                     style={styles.button}
                     mode="contained"
@@ -92,8 +93,9 @@ const Login = ({ navigation }) => {
         </SafeAreaView>
         </Provider>
     );
-}
+};
 
+// Estilos del componente
 const styles = StyleSheet.create({
     container: {
         flex: 1,
