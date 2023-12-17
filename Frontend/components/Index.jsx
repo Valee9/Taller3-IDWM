@@ -1,19 +1,21 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect, useContext } from 'react';
+// Importa los módulos necesarios de React, React Native y otras bibliotecas
+import React from 'react';
 import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native';
-import { Button, ActivityIndicator } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import logo from '../assets/logo.png'
 
+// Define el componente Index
 const Index = ({ navigation }) => {
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState([]);
-
+    // Navega a la pantalla de login
     const toLogin = () => {
         navigation.navigate('Login')
-    }
+    };
+    // Navega a la pantalla de registration
     const toRegistration = () => {
         navigation.navigate('Registration')
-    }
+    };
+
+    // Renderiza el componente
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
@@ -24,9 +26,7 @@ const Index = ({ navigation }) => {
             <View style={styles.body}>
                 <Text style={styles.title}>MobileHub</Text>
                 <Text style={styles.subtitle1}>¡Hola!</Text>
-                {loading && <ActivityIndicator style={styles.activityIndicator} color='#00A898' />}
-
-                <StatusBar style="auto" />
+                
                 <Button
                     style={styles.button}
                     mode="contained"
@@ -59,8 +59,9 @@ const Index = ({ navigation }) => {
         </SafeAreaView>
 
     );
-}
+};
 
+// Estilos del componente
 const styles = StyleSheet.create({
     container: {
         flex: 1,

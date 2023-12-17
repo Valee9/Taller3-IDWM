@@ -1,7 +1,6 @@
 // Importa los módulos necesarios de React, React Native y otras bibliotecas
-import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import { Button, Modal, Portal, Provider } from 'react-native-paper';
 import { Table, Row } from 'react-native-table-component';
 import { AuthContext } from '../context/AuthContext';
