@@ -1,19 +1,85 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView } from 'react-native';
-import { Button, ActivityIndicator } from 'react-native-paper';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import { Button, Modal, Portal, Provider } from 'react-native-paper';
+import { Table, Row } from 'react-native-table-component';
 import { AuthContext } from '../context/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import axios from 'axios';
 
-const Home = ( {navigation} ) => {
+const Home = ({ navigation }) => {
 
     const { logOut } = useContext(AuthContext);
 
     const toProfile = () => {
         navigation.navigate('Profile');
     };
+
+    const toPassword = () => {
+        navigation.navigate('Password');
+    };
+
+    const [repos, setRepos] = useState([])
+    const [commits, setCommits] = useState([])
+    useEffect(() => {
+        const obtenerRepos = async () => {
+            try {
+                const response = await axios.get(`http://localhost:3001/repos`);
+                setRepos(response.data)
+                console.log(response.data)
+
+            } catch (error) {
+                console.error('Error al obtener los repositorios:', error.message);
+            }
+        };
+
+        // Llama a la función para obtener los administradores
+        obtenerRepos();
+    }, []);
+
+    const tableHead = ['Nombre', 'Fecha', 'Commits', 'Acciones'];
+
+    const tableData = repos.map((repo, index) => [
+
+        `${repo.name}`,
+        `${new Date(repo.created_at).toLocaleDateString()}`,
+        `${repo.commits}`,
+        <View style={styles.buttonAction}>
+            <Button style={styles.buttonMore} key={index} onPress={() => handleVerMasClick(repo)} mode="contained" labelStyle={styles.buttonLabelMore}>
+                Ver
+            </Button>
+        </View>
+
+    ]);
+
+    const [visible, setVisible] = useState(false);
+    const handleVerMasClick = async (repo) => {
+        console.log(`Ver más clic en el repositorio: ${repo.name}`);
+        try {
+            // Realizar una solicitud al servidor para obtener los commits del repositorio seleccionado
+            const response = await axios.get(`http://localhost:3001/repos/${repo.name}`);
+        
+            // response.data contendrá la lista de commits
+            const commit = response.data;
+            setCommits(commit)
+            console.log(commit)
+            setVisible(true);
+          } catch (error) {
+            console.error('Error al obtener los commits:', error.message);
+          }
+    };
+
+    const tableHead1 = ['Mensaje', 'Fecha'];
+
+    const tableData1 = commits.map((commit) => [
+
+        `${commit.commit.message}`,
+        `${new Date(commit.commit.author.date).toLocaleDateString()}`
     
+    ]);
+
     return (
+        <Provider>
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.orange}></View>
@@ -27,19 +93,66 @@ const Home = ( {navigation} ) => {
                 <TouchableOpacity style={styles.buttonBack} onPress={() => toProfile()}>
                     <Icon name="user" size={26} color="black" weight="light" />
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonBack} onPress={() => toPassword()}>
+                    <Icon name="key" size={26} color="black" weight="light" />
+                </TouchableOpacity>
             </View>
             <View style={styles.body}>
                 <Text style={styles.title}>MobileHub</Text>
-                <Text style={styles.subtitle1}>¡Hola!</Text>
-                <Text style={styles.subtitle2}>Registrarse</Text>
+
+                {Array.isArray(repos) && repos.length > 0 ? (
+                    <>
+                        <ScrollView style={styles.tableContainer}>
+                            <Table borderStyle={styles.border}>
+                                <Row data={tableHead} style={styles.head} textStyle={styles.headText} />
+                                {tableData.map((rowData, index) => (
+                                    <Row key={index} data={rowData} textStyle={styles.rowText} />
+                                ))}
+
+                            </Table>
+
+                        </ScrollView>
+                    </>
+
+                ) : (
+                    <Text style={styles.subtitle1}>Cargando repositorios...</Text>
+                )}
 
             </View>
+            <Portal>
+                <Modal visible={visible} style={styles.modalContainer} onDismiss={() => setVisible(false)}>
+                    <View style={styles.modalContent}>
+                        <Text style={[styles.title, { fontSize: 22, color: 'black' },]}>Commits</Text>
+
+                        {Array.isArray(commits) && commits.length > 0 ? (
+                    <>
+                        <ScrollView style={styles.tableContainer}>
+                            <Table borderStyle={styles.border}>
+                                <Row data={tableHead1} style={styles.head} textStyle={styles.headText} />
+                                {tableData1.map((rowData, index) => (
+                                    <Row key={index} data={rowData} textStyle={styles.rowText} />
+                                ))}
+
+                            </Table>
+
+                        </ScrollView>
+                    </>
+
+                ) : (
+                    <Text style={styles.subtitle1}>Cargando repositorios...</Text>
+                )}
+
+                        <Button style={styles.button} onPress={() => setVisible(false)} labelStyle={styles.buttonLabel}>Cerrar</Button>
+                    </View>
+                </Modal>
+            </Portal>
             <View style={styles.footer}>
                 <View style={styles.gray}></View>
                 <View style={styles.black}></View>
                 <View style={styles.orange}></View>
             </View>
         </SafeAreaView>
+        </Provider>
     )
 }
 const styles = StyleSheet.create({
@@ -56,7 +169,6 @@ const styles = StyleSheet.create({
         width: '100%',
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
     },
     footer: {
         alignSelf: 'stretch',
@@ -137,10 +249,32 @@ const styles = StyleSheet.create({
     },
     buttonLabel: {
         fontFamily: 'Inika',
-        fontSize: 20
+        fontSize: 20,
+        color: 'white'
     },
-    activityIndicator: {
-        marginTop: 20
+    buttonAction:{
+        alignItems: 'center',
+        margin: 5
+      },
+    buttonMore: {
+        height: 30,
+        width: 70,
+        padding: 0,
+        backgroundColor: '#FCAF43',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    buttonLabelMore: {
+        fontFamily: 'Inika',
+        fontSize: 12,
+        margin: 0,
+        color: 'white'
     },
     validationMessageContainer: {
         marginTop: 5,
@@ -156,6 +290,43 @@ const styles = StyleSheet.create({
     back: {
         flexDirection: 'row-reverse',
         alignItems: 'center',
-    }
+    },
+    tableContainer: {
+        width: '95%',
+        marginBottom: 15,
+    },
+    head: {
+        height: 40,
+        backgroundColor: '#bbb',
+        fontFamily: 'Inika'
+    },
+    headText: {
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#fff',
+        fontFamily: 'Inika'
+    },
+    rowText: {
+        margin: 5,
+        textAlign: 'center',
+        fontFamily: 'Inika',
+    },
+    border: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+    },
+    modalContainer: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        alignItems: 'center',
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: 350,
+        maxHeight: 700
+    },
 });
 export default Home
