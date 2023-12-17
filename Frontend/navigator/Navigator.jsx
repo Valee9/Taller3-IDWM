@@ -5,6 +5,7 @@ import Login from '../components/Login';
 import Registration from '../components/Registration';
 import Home from '../components/Home';
 import Profile from '../components/Profile';
+import Password from '../components/Password';
 import { AuthContext } from '../context/AuthContext';
 
 const Stack = createNativeStackNavigator();
@@ -29,6 +30,7 @@ export const Navigator = () => {
         <>
             <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
             <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+            <Stack.Screen name="Password" component={Password} options={{ headerShown: false }} />
         </>
       )}
     </Stack.Navigator>
