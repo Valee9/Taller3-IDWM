@@ -16,9 +16,7 @@ const Login = ({ navigation }) => {
     const [visible, setVisible] = useState(false);
     // Maneja el inicio de sesión
     const handleSignIn = async () => {
-        console.log(email,password)
         const response = await signIn({email, password});
-        console.log(response.success)
         if (!response.success) {
             setVisible(true);
             setTimeout(() => {
