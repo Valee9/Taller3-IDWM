@@ -9,6 +9,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
+import githubRoutes from './routes/github.js';
 import adminModel  from './models/admin.js';
 import { adminSeeds } from './seeders/admin.js';
 
@@ -29,6 +30,9 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use('/admin',adminRoutes);
 // Ruta de la API para operaciones relacionadas con la autenticación.
 app.use('/',authRoutes);
+// Ruta de la API para operaciones relacionadas con github.
+app.use('/repos',githubRoutes);
+
 // Puerto en el que se ejecutará el servidor, obtenido desde las variables de entorno o por defecto 6001.
 const PORT = process.env.PORT || 6001;
 mongoose.connect(process.env.MONGO_URL,{
