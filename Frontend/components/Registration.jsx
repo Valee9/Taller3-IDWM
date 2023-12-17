@@ -1,13 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView } from 'react-native';
-import { Button, ActivityIndicator } from 'react-native-paper';
+import { Button, Modal, Portal, Provider } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Registration = ({ navigation }) => {
 
-    const { signUp } = useContext(AuthContext)
+    const { signUp, errorMessage, removeError } = useContext(AuthContext)
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [year, setYear] = useState('');
@@ -125,114 +125,157 @@ const Registration = ({ navigation }) => {
             validationYear === 'Año de nacimiento válido' &&
             validationRut === 'RUT válido'
         );
+        // setVisible(true);
+        // setTimeout(() => {
+        //     setVisible(false);
+        //     navigation.navigate('Login');
+        // }, 1500);
     }, [validationEmail, validationName, validationYear, validationRut]);
 
-    const handleButton = () => {
+    const [visible, setVisible] = useState(false);
+    const [visible1, setVisible1] = useState(false);
+
+    const handleButton = async () => {
+
         if (isValid) {
             console.log(email, name, year, rut);
-            signUp({ email, name, year, rut });
+            const response = await signUp({ email, name, year, rut });
+            console.log(response.success)
+            if (response.success) {
+                // La solicitud fue exitosa, puedes acceder a response.data
+                console.log('Registro exitoso:');
+                setVisible(true);
+                setTimeout(() => {
+                    setVisible(false);
+                    navigation.navigate('Login');
+                }, 1500);
+              } else {
+                // La solicitud falló, puedes acceder a response.error
+                console.log('Error en el registro:');
+                setVisible1(true);
+                setTimeout(() => {
+                    setVisible1(false);
+                }, 1500);
+              }
         }
     };
     const toIndex = () => {
         navigation.navigate('Index');
     };
+
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <View style={styles.orange}></View>
-                <View style={styles.black}></View>
-                <View style={styles.gray}></View>
-            </View>
-            <View style={styles.back}>
-                <TouchableOpacity style={styles.buttonBack} onPress={() => toIndex()}>
-                    <Icon name="arrow-left" size={20} color="black" weight="light" />
-                </TouchableOpacity>
-            </View>
-            <View style={styles.body}>
-                <Text style={styles.title}>MobileHub</Text>
-                <Text style={styles.subtitle1}>¡Hola!</Text>
-                <Text style={styles.subtitle2}>Registrarse</Text>
-                <View style={styles.form}>
-                    <Text style={styles.label}>Correo</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder='correo@alumnos.ucn.cl'
-                        placeholderTextColor='#ccc'
-                        value={email}
-                        onChangeText={(text) => setEmail(text)}
-                    />
-                    {email !== '' && validationEmail !== '' && (
-                        <View style={styles.validationMessageContainer}>
-                            <Text style={[styles.validationEmail, { color: validationColorEmail }]}>{validationEmail}</Text>
-                        </View>
-                    )}
-                    <Text style={styles.label}>Nombre completo</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder='Juan Perez'
-                        placeholderTextColor='#ccc'
-                        value={name}
-                        onChangeText={(text) => setName(text)}
-                    />
-                    {name !== '' && validationName !== '' && (
-                        <View style={styles.validationMessageContainer}>
-                            <Text style={[styles.validationName, { color: validationColorName }]}>{validationName}</Text>
-                        </View>
-                    )}
-                    <Text style={styles.label}>Año de nacimiento</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder='1900'
-                        placeholderTextColor='#ccc'
-                        keyboardType="numeric"
-                        value={year}
-                        onChangeText={(text) => setYear(text)}
-                    />
-                    {year !== '' && validationYear !== '' && (
-                        <View style={styles.validationMessageContainer}>
-                            <Text style={[styles.validationYear, { color: validationColorYear }]}>{validationYear}</Text>
-                        </View>
-                    )}
-                    <Text style={styles.label}>Rut</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder='12.345.678-9'
-                        placeholderTextColor='#ccc'
-                        value={rut}
-                        onChangeText={(text) => setRut(text)}
-                    />
-                    {rut !== '' && validationRut !== '' && (
-                        <View style={styles.validationMessageContainer}>
-                            <Text style={[styles.validationRut, { color: validationColorRut }]}>{validationRut}</Text>
-                        </View>
-                    )}
-
+        <Provider>
+            <SafeAreaView style={styles.container}>
+                <View style={styles.header}>
+                    <View style={styles.orange}></View>
+                    <View style={styles.black}></View>
+                    <View style={styles.gray}></View>
                 </View>
+                <View style={styles.back}>
+                    <TouchableOpacity style={styles.buttonBack} onPress={() => toIndex()}>
+                        <Icon name="arrow-left" size={20} color="black" weight="light" />
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                    <Text style={styles.title}>MobileHub</Text>
+                    <Text style={styles.subtitle1}>¡Hola!</Text>
+                    <Text style={styles.subtitle2}>Registrarse</Text>
+                    <View style={styles.form}>
+                        <Text style={styles.label}>Correo</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder='correo@alumnos.ucn.cl'
+                            placeholderTextColor='#ccc'
+                            value={email}
+                            onChangeText={(text) => setEmail(text)}
+                        />
+                        {email !== '' && validationEmail !== '' && (
+                            <View style={styles.validationMessageContainer}>
+                                <Text style={[styles.validationEmail, { color: validationColorEmail }]}>{validationEmail}</Text>
+                            </View>
+                        )}
+                        <Text style={styles.label}>Nombre completo</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder='Juan Perez'
+                            placeholderTextColor='#ccc'
+                            value={name}
+                            onChangeText={(text) => setName(text)}
+                        />
+                        {name !== '' && validationName !== '' && (
+                            <View style={styles.validationMessageContainer}>
+                                <Text style={[styles.validationName, { color: validationColorName }]}>{validationName}</Text>
+                            </View>
+                        )}
+                        <Text style={styles.label}>Año de nacimiento</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder='1900'
+                            placeholderTextColor='#ccc'
+                            keyboardType="numeric"
+                            value={year}
+                            onChangeText={(text) => setYear(text)}
+                        />
+                        {year !== '' && validationYear !== '' && (
+                            <View style={styles.validationMessageContainer}>
+                                <Text style={[styles.validationYear, { color: validationColorYear }]}>{validationYear}</Text>
+                            </View>
+                        )}
+                        <Text style={styles.label}>Rut</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder='12.345.678-9'
+                            placeholderTextColor='#ccc'
+                            value={rut}
+                            onChangeText={(text) => setRut(text)}
+                        />
+                        {rut !== '' && validationRut !== '' && (
+                            <View style={styles.validationMessageContainer}>
+                                <Text style={[styles.validationRut, { color: validationColorRut }]}>{validationRut}</Text>
+                            </View>
+                        )}
 
-                <StatusBar style="auto" />
-                <Button
-                    style={[styles.button,
+                    </View>
+
+                    <StatusBar style="auto" />
+                    <Button
+                        style={[styles.button,
                         !isValid && { backgroundColor: 'gray' },]}
-                    mode="contained"
-                    contentStyle={styles.buttonContent}
-                    labelStyle={[
-                        styles.buttonLabel,
-                        !isValid && { color: 'white' },
-                    ]}
-                    onPress={handleButton}
-                    disabled={!isValid}
-
-                >
-                    Registrarse
-                </Button>
-            </View>
-            <View style={styles.footer}>
-                <View style={styles.gray}></View>
-                <View style={styles.black}></View>
-                <View style={styles.orange}></View>
-            </View>
-        </SafeAreaView>
-
+                        mode="contained"
+                        contentStyle={styles.buttonContent}
+                        labelStyle={[
+                            styles.buttonLabel,
+                            !isValid && { color: 'white' },
+                        ]}
+                        onPress={handleButton}
+                        disabled={!isValid}
+                    >
+                        Registrarse
+                    </Button>
+                </View>
+                <Portal>
+                    <Modal visible={visible} style={styles.modalContainer} onDismiss={() => setVisible(false)}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.title}>¡Registro éxitoso!</Text>
+                            <Text style={styles.subtitle1}>Inicia sesión</Text>
+                        </View>
+                    </Modal>
+                </Portal>
+                <Portal>
+                    <Modal visible={visible1} style={styles.modalContainer} onDismiss={() => setVisible1(false)}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.title}>Error en el registro</Text>
+                            <Text style={styles.subtitle1}>Intentalo otra vez</Text>
+                        </View>
+                    </Modal>
+                </Portal>
+                <View style={styles.footer}>
+                    <View style={styles.gray}></View>
+                    <View style={styles.black}></View>
+                    <View style={styles.orange}></View>
+                </View>
+            </SafeAreaView>
+        </Provider>
     );
 }
 
@@ -250,7 +293,6 @@ const styles = StyleSheet.create({
         width: '100%',
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
     },
     footer: {
         alignSelf: 'stretch',
@@ -331,7 +373,8 @@ const styles = StyleSheet.create({
     },
     buttonLabel: {
         fontFamily: 'Inika',
-        fontSize: 20
+        fontSize: 20,
+        color: 'white'
     },
     activityIndicator: {
         marginTop: 20
@@ -345,6 +388,17 @@ const styles = StyleSheet.create({
     },
     buttonBack: {
         margin: '5px'
+    },
+    modalContainer: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        alignItems: 'center',
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
     },
 });
 
