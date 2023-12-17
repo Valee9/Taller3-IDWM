@@ -1,18 +1,20 @@
-import { StatusBar } from 'expo-status-bar';
+// Importa los módulos necesarios de React, React Native y otras bibliotecas
 import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Button, Modal, Portal, Provider } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+// Define el componente Registration
 const Registration = ({ navigation }) => {
-
-    const { signUp, errorMessage, removeError } = useContext(AuthContext)
+    // Obtiene el registrarse desde el contexto de autenticación
+    const { signUp} = useContext(AuthContext)
+    // Estado para almacenar el email, name, year y rut
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [year, setYear] = useState('');
     const [rut, setRut] = useState('');
 
+    // Estado de las valdiaciones y colores de las validaciones
     const [validationEmail, setValidationEmail] = useState('');
     const [validationName, setValidationName] = useState('');
     const [validationYear, setValidationYear] = useState('');
@@ -22,7 +24,7 @@ const Registration = ({ navigation }) => {
     const [validationColorName, setValidationColorName] = useState('');
     const [validationColorYear, setValidationColorYear] = useState('');
     const [validationColorRut, setValidationColorRut] = useState('');
-
+    // Valida si el email ingresado cumple con el formato definido
     const validateEmail = () => {
         const emailRegex = /^[a-zA-Z0-9._-]+@(ucn\.cl|alumnos\.ucn\.cl|disc\.ucn\.cl|ce\.ucn\.cl)$/;
         if (!email) {
@@ -37,7 +39,7 @@ const Registration = ({ navigation }) => {
             setValidationColorEmail('red');
         }
     };
-
+    // Valida si el name ingresado cumple con el formato definido
     const validateName = () => {
         const longitudName = name.trim().length;
         if (!name) {
@@ -57,7 +59,7 @@ const Registration = ({ navigation }) => {
             setValidationColorName('red');
         }
     };
-
+    // Valida si el year ingresado cumple con el formato definido
     const validateYear = () => {
         if (!year) {
             setValidationYear('Debe ingresar un año');
@@ -79,7 +81,7 @@ const Registration = ({ navigation }) => {
             }
         }
     };
-
+    // Valida si el rut ingresado cumple con el formato definido
     const validateRut = () => {
         const cleanRut = rut.replace(/[.-]/g, '');
 
@@ -109,14 +111,20 @@ const Registration = ({ navigation }) => {
             setValidationColorRut('red');
         }
     };
-
+// Estado de validez de la información y visibilidad de los modal 
     const [isValid, setIsValid] = useState(false);
+    const [visible, setVisible] = useState(false);
+    const [visible1, setVisible1] = useState(false);
+
+    // Efecto para cargar las funciones de validaciones
     useEffect(() => {
         validateEmail();
         validateName();
         validateYear();
         validateRut();
     }, [email, name, year, rut]);
+    
+    // Efecto para cargar las validaciones
     useEffect(() => {
         // Verifica si todas las validaciones son exitosas
         setIsValid(
@@ -125,20 +133,12 @@ const Registration = ({ navigation }) => {
             validationYear === 'Año de nacimiento válido' &&
             validationRut === 'RUT válido'
         );
-        // setVisible(true);
-        // setTimeout(() => {
-        //     setVisible(false);
-        //     navigation.navigate('Login');
-        // }, 1500);
     }, [validationEmail, validationName, validationYear, validationRut]);
 
-    const [visible, setVisible] = useState(false);
-    const [visible1, setVisible1] = useState(false);
-
+    // función para registrar un nuevo usuario
     const handleButton = async () => {
 
         if (isValid) {
-            console.log(email, name, year, rut);
             const response = await signUp({ email, name, year, rut });
             console.log(response.success)
             if (response.success) {
@@ -158,11 +158,12 @@ const Registration = ({ navigation }) => {
                 }, 1500);
               }
         }
-    };
+    };    
+    // Navega a la pantalla de index
     const toIndex = () => {
         navigation.navigate('Index');
     };
-
+    // Renderiza el componente
     return (
         <Provider>
             <SafeAreaView style={styles.container}>
@@ -236,8 +237,6 @@ const Registration = ({ navigation }) => {
                         )}
 
                     </View>
-
-                    <StatusBar style="auto" />
                     <Button
                         style={[styles.button,
                         !isValid && { backgroundColor: 'gray' },]}
@@ -278,7 +277,7 @@ const Registration = ({ navigation }) => {
         </Provider>
     );
 }
-
+// Estilos del componente
 const styles = StyleSheet.create({
     container: {
         flex: 1,
